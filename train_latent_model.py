@@ -13,6 +13,16 @@ from latent_models.latent_finetuning import Trainer
 import argparse
 
 def main(args):
+    # Check for MPS availability
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using MPS device")
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+        print("Using CUDA device")
+    else:
+        device = torch.device("cpu")
+        print("Using CPU device")
     
     trainer = Trainer(
         args=args,
@@ -89,6 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--eval", action="store_true")
     parser.add_argument("--resume_training", action="store_true", default=False)
     parser.add_argument("--resume_dir", type=str, default=None)
+    parser.add_argument("--use_mps", action="store_true", help="Use MPS device if available")
 
     args = parser.parse_args()
 
@@ -96,7 +107,7 @@ if __name__ == "__main__":
         with open(os.path.join(args.resume_dir, 'args.json'), 'rt') as f:
             saved_args = json.load(f)
         args_dict = vars(args)
-        heldout_params = {'wandb_name', 'output_dir', 'resume_dir', 'eval'}
+        heldout_params = {'wandb_name', 'output_dir', 'resume_dir', 'eval', 'use_mps'}
         for k,v in saved_args.items():
             if k in heldout_params:
                 continue

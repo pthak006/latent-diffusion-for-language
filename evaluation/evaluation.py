@@ -8,10 +8,22 @@ import spacy
 import numpy as np
 import wandb
 
+def get_device():
+    if torch.cuda.is_available():
+        return 'cuda'
+    elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+        return 'mps'
+    else:
+        return 'cpu'
+
 def compute_perplexity(all_texts_list, model_id='gpt2-large'):
     torch.cuda.empty_cache() 
     perplexity = load("perplexity", module_type="metric")
-    results = perplexity.compute(predictions=all_texts_list, model_id=model_id, device='cuda')
+    # Convert 'mps' to 'cpu' as perplexity only accepts 'gpu', 'cuda', or 'cpu'
+    device = get_device()
+    if device == 'mps':
+        device = 'cpu'
+    results = perplexity.compute(predictions=all_texts_list, model_id=model_id, device=device)
     return results['mean_perplexity']
 
 def compute_wordcount(all_texts_list):
@@ -64,8 +76,11 @@ def compute_mauve(all_texts_list, human_references, model_id):
     torch.cuda.empty_cache() 
     assert model_id == 'gpt2-large'
     mauve = load("mauve")
-
-    results = mauve.compute(predictions=all_texts_list, references=human_references, featurize_model_name=model_id, max_text_length=256, device_id=0)
+    
+    # Handle MPS device - mauve only supports cuda or cpu
+    device = get_device()
+    device_id = 0 if device == 'cuda' else None
+    results = mauve.compute(predictions=all_texts_list, references=human_references, featurize_model_name=model_id, max_text_length=256, device_id=device_id)
 
     assert len(all_texts_list) == len(human_references)
     
@@ -91,7 +106,10 @@ def compute_debertascore(all_texts_list, human_references):
     bert = load("bertscore")
 
     human_references = [[ref] for ref in human_references]
-    results = bert.compute(predictions=all_texts_list, references=human_references, lang="en", model_type='microsoft/deberta-xlarge-mnli')
+    # BERTScore may have device issues with MPS
+    device = get_device()
+    device = 'cpu' if device == 'mps' else device
+    results = bert.compute(predictions=all_texts_list, references=human_references, lang="en", model_type='microsoft/deberta-xlarge-mnli', device=device)
 
     del results['hashcode']
     for key, value in results.items():
@@ -104,7 +122,10 @@ def compute_bertscore(all_texts_list, human_references):
     bert = load("bertscore")
 
     human_references = [[ref] for ref in human_references]
-    results = bert.compute(predictions=all_texts_list, references=human_references, lang="en", rescale_with_baseline=True)
+    # BERTScore may have device issues with MPS
+    device = get_device()
+    device = 'cpu' if device == 'mps' else device
+    results = bert.compute(predictions=all_texts_list, references=human_references, lang="en", rescale_with_baseline=True, device=device)
 
     del results['hashcode']
     for key, value in results.items():

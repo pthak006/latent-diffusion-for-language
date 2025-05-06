@@ -1,0 +1,38 @@
+  │   ├── CONSTANTS.py
+  │   │   ├── denoising_collator.py
+  │   │   ├── flan_collator.py
+  │   │   ├── text_dataset.py
+  │   │   │   ├── test.jsonl
+  │   │   │   ├── train.jsonl
+  │   │   │   ├── valid.jsonl
+  │   │   │   ├── roc_train.json
+  │   │   │   ├── roc_valid.json
+  │   │   │   ├── ROCstory_full.csv
+  │   │   │   ├── ROCstory17.csv
+  │   │   │   ├── ROCstory2016.csv
+  │   │   ├── constant.py
+  │   │   ├── optimizer.py
+  │   │   ├── text_denoising_diffusion.py
+  │   ├── directory_tree.txt
+  │   ├── environment.yml
+  │   │   ├── evaluation.py
+  │   │   ├── method.png
+  │   │   ├── bart_latent_model.py
+  │   │   ├── latent_finetuning.py
+  │   │   ├── latent_utils.py
+  │   │   ├── perceiver_ae.py
+  │   │   ├── t5_latent_model.py
+  │   ├── LICENSE
+  │   │   ├── diffusion_transformer.py
+  │   │   ├── x_transformer.py
+  │   ├── project_tree.txt
+  │   ├── README.md
+  │   ├── requirements.txt
+  │   │   │   ├── bart_base_roc.sh
+  │   │   │   ├── bart_latent_v-pred.sh
+  │   │   │   ├── eval.sh
+  │   ├── train_latent_model.py
+  │   ├── train_text_diffusion.py
+  │   │   ├── __init__.py
+  │   │   ├── file_utils.py
+  │   │   ├── torch_utils.py
